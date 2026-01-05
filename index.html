@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ฐานข้อมูลหน้าตัดเหล็ก H-Beam - SYS Catalog 2022</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #1a2332;
+            --primary-blue: #2a4365;
+            --accent-steel: #4a90a4;
+            --accent-orange: #e67e22;
+            --bg-main: #f8f9fa;
+            --bg-card: #ffffff;
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --border-light: #e2e8f0;
+            --border-medium: #cbd5e0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+            --shadow-lg: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans Thai', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-blue) 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(74,144,164,0.2) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+            font-weight: 300;
+        }
+
+        .controls {
+            padding: 2rem;
+            background: var(--bg-main);
+            border-bottom: 2px solid var(--border-light);
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 3rem;
+            border: 2px solid var(--border-medium);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'IBM Plex Sans Thai', sans-serif;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent-steel);
+            box-shadow: 0 0 0 3px rgba(74,144,164,0.1);
+        }
+
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            opacity: 0.5;
+        }
+
+        .stats {
+            display: flex;
+            gap: 1.5rem;
+            padding: 0 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: var(--accent-steel);
+            font-size: 1.1rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            padding: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.9rem;
+        }
+
+        thead {
+            background: var(--primary-dark);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        thead th {
+            padding: 1rem 0.75rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            transition: background 0.2s ease;
+            user-select: none;
+        }
+
+        thead th:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        thead th:last-child {
+            border-right: none;
+        }
+
+        tbody tr {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        tbody tr:hover {
+            background: linear-gradient(90deg, rgba(74,144,164,0.05) 0%, rgba(74,144,164,0.02) 100%);
+            transform: translateX(2px);
+            box-shadow: -4px 0 0 var(--accent-steel);
+        }
+
+        tbody td {
+            padding: 0.875rem 0.75rem;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            border-right: 1px solid var(--border-light);
+        }
+
+        tbody td:first-child {
+            font-weight: 600;
+            color: var(--accent-steel);
+            font-size: 0.9rem;
+            background: rgba(74,144,164,0.03);
+        }
+
+        tbody td:last-child {
+            border-right: none;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .no-results::before {
+            content: '⚠️';
+            display: block;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        footer {
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 2px solid var(--border-light);
+            background: var(--bg-main);
+        }
+
+        .footer-note {
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+
+            header h1 {
+                font-size: 1.75rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                padding: 1.5rem;
+            }
+
+            .search-box {
+                min-width: 100%;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 0.5rem;
+                padding: 0;
+            }
+
+            .table-container {
+                padding: 1rem;
+            }
+
+            table {
+                font-size: 0.75rem;
+            }
+
+            thead th, tbody td {
+                padding: 0.5rem 0.4rem;
+            }
+        }
+
+        /* Sortable indicators */
+        thead th::after {
+            content: '⇅';
+            margin-left: 0.5rem;
+            opacity: 0.3;
+            font-size: 0.8rem;
+        }
+
+        thead th.sort-asc::after {
+            content: '↑';
+            opacity: 1;
+            color: var(--accent-orange);
+        }
+
+        thead th.sort-desc::after {
+            content: '↓';
+            opacity: 1;
+            color: var(--accent-orange);
+        }
+
+        /* Loading animation */
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        .loading tbody tr {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ฐานข้อมูลหน้าตัดเหล็ก H-Beam</h1>
+            <p>SYS Catalog 2022 | อ้างอิง TIS 1227-2558 (2015) | Strong Axis = x, Weak Axis = y</p>
+        </header>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="ค้นหาขนาดหรือคุณสมบัติ (เช่น 300x300, H150, 100x50)">
+            </div>
+            <div class="stats">
+                <div class="stat-item">
+                    <span>แสดง:</span>
+                    <span class="stat-value" id="visibleCount">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>ทั้งหมด:</span>
+                    <span class="stat-value" id="totalCount">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th data-column="0">Nominal Size</th>
+                        <th data-column="1">H<br>(mm)</th>
+                        <th data-column="2">B<br>(mm)</th>
+                        <th data-column="3">t₁<br>(mm)</th>
+                        <th data-column="4">t₂<br>(mm)</th>
+                        <th data-column="5">r<br>(mm)</th>
+                        <th data-column="6">Weight<br>(kg/m)</th>
+                        <th data-column="7">Area<br>(cm²)</th>
+                        <th data-column="8">Iₓ<br>(cm⁴)</th>
+                        <th data-column="9">Iᵧ<br>(cm⁴)</th>
+                        <th data-column="10">rₓ<br>(cm)</th>
+                        <th data-column="11">rᵧ<br>(cm)</th>
+                        <th data-column="12">Sₓ<br>(cm³)</th>
+                        <th data-column="13">Sᵧ<br>(cm³)</th>
+                        <th data-column="14">Zₓ<br>(cm³)</th>
+                        <th data-column="15">Zᵧ<br>(cm³)</th>
+                        <th data-column="16">J<br>(cm⁴)</th>
+                        <th data-column="17">Cw<br>(cm⁶)</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Data will be populated by JavaScript -->
+                </tbody>
+            </table>
+            <div id="noResults" class="no-results" style="display: none;">
+                ไม่พบข้อมูลที่ตรงกับการค้นหา
+            </div>
+        </div>
+
+        <footer>
+            <strong>หมายเหตุ:</strong> ข้อมูลอ้างอิงจาก SYS Catalog 2022 ตามมาตรฐาน TIS 1227-2558 (2015)
+            <div class="footer-note">
+                Strong Axis (แกนแข็ง) = x | Weak Axis (แกนอ่อน) = y
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const data = [
+            ["100x50", 100, 50, 5.0, 7, 8, 9.30, 11.85, 187, 14.8, 3.98, 1.12, 37.5, 5.91, 41.80, 9.29, 1.51, 3200],
+            ["100x100", 100, 100, 6.0, 8, 10, 17.2, 21.90, 383, 134, 4.2, 2.47, 77, 27, 84.18, 40.76, 4.02, 28354],
+            ["125x125", 125, 125, 6.5, 9, 10, 23.8, 30.31, 847, 293, 5.3, 3.11, 136, 47, 148.97, 71.07, 7.05, 98460],
+            ["150x75", 150, 75, 5.0, 7, 8, 14.0, 17.85, 666, 50, 6.1, 1.66, 89, 13, 99.88, 20.44, 2.27, 25561],
+            ["150x100", 148, 100, 6.0, 9, 11, 21.1, 26.84, 1020, 151, 6.2, 2.37, 138, 30, 155.61, 46.17, 5.79, 73024],
+            ["150x150", 150, 150, 7.0, 10, 11, 31.5, 40.14, 1640, 563, 6.4, 3.75, 219, 75, 239.58, 114.09, 11.49, 275870],
+            ["175x90", 175, 90, 5.0, 8, 9, 18.1, 23.04, 1210, 97.5, 7.26, 2.06, 139, 21.7, 155.45, 33.40, 3.73, 68034],
+            ["175x175", 175, 175, 7.5, 11, 12, 40.2, 51.21, 2880, 984, 7.5, 4.38, 330, 112, 362.47, 171.13, 17.65, 661659],
+            ["200x100 (a)", 198, 99, 4.5, 7, 11, 18.2, 23.18, 1580, 114, 8.3, 2.21, 160, 23, 179.62, 35.25, 2.82, 103972],
+            ["200x100 (b)", 200, 100, 5.5, 8, 11, 21.3, 27.16, 1840, 134, 8.2, 2.22, 184, 27, 206.90, 41.26, 4.41, 123594],
+            ["200x150", 194, 150, 6.0, 9, 13, 30.6, 39.01, 2690, 507, 8.3, 3.61, 277, 68, 311.12, 103.16, 8.61, 433799],
+            ["200x200 (a)", 200, 200, 8.0, 12, 13, 49.9, 63.53, 4720, 1600, 8.6, 5.02, 472, 160, 513.15, 242.82, 26.01, 1414000],
+            ["200x200 (b)", 200, 204, 12.0, 12, 13, 56.2, 71.53, 4980, 1700, 8.4, 4.88, 498, 167, 545.09, 252.54, 33.74, 1502400],
+            ["200x200 (c)", 208, 202, 10.0, 16, 13, 65.7, 83.69, 6530, 2200, 8.8, 5.13, 628, 218, 693.30, 330.01, 58.01, 2050400],
+            ["250x125 (a)", 248, 124, 5.0, 8, 12, 25.7, 32.68, 3540, 255, 10.4, 2.79, 285, 41, 318.57, 62.91, 5.48, 363375],
+            ["250x125 (b)", 250, 125, 6.0, 9, 12, 29.6, 37.66, 4050, 294, 10.4, 2.79, 324, 47, 362.41, 72.17, 7.97, 427621],
+            ["250x175", 244, 175, 7.0, 11, 16, 44.1, 56.24, 6120, 984, 10.4, 4.18, 502, 113, 561.12, 172.07, 17.58, 1335465],
+            ["250x250 (a)", 244, 252, 11.0, 11, 16, 64.4, 82.06, 8790, 2940, 10.3, 5.98, 720, 233, 804.14, 354.00, 29.17, 3982215],
+            ["250x250 (b)", 248, 249, 8.0, 13, 16, 66.5, 84.70, 9930, 3350, 10.8, 6.29, 801, 269, 895.84, 408.82, 34.29, 4570361],
+            ["250x250 (c)", 250, 250, 9.0, 14, 16, 72.4, 92.18, 10800, 3650, 10.8, 6.29, 867, 292, 971.21, 443.76, 43.68, 5035285],
+            ["250x250 (d)", 250, 255, 14.0, 14, 16, 82.2, 104.70, 11500, 3880, 10.5, 6.09, 919, 304, 1031.91, 462.15, 50.84, 5352450],
+            ["300x150 (a)", 298, 149, 5.5, 8, 13, 32.0, 40.80, 6320, 442, 12.4, 3.29, 424, 59, 475.43, 90.71, 7.15, 928200],
+            ["300x150 (b)", 300, 150, 6.5, 9, 13, 36.7, 46.78, 7210, 508, 12.4, 3.29, 481, 68, 540.35, 104.38, 10.37, 1077816],
+            ["300x200 (a)", 294, 200, 8.0, 12, 18, 56.8, 72.38, 11300, 1600, 12.5, 4.71, 771, 160, 863.00, 244.70, 32.33, 3181200],
+            ["300x200 (b)", 298, 201, 9.0, 14, 18, 65.4, 83.36, 13300, 1900, 12.6, 4.17, 893, 189, 1004.21, 288.01, 49.33, 3874082],
+            ["300x300 (a)", 294, 302, 12.0, 12, 18, 84.5, 107.70, 16900, 5520, 12.5, 7.16, 1150, 365, 1272.54, 553.84, 45.41, 10974744],
+            ["300x300 (b)", 298, 299, 9.0, 14, 18, 87.0, 110.80, 18800, 6240, 13.0, 7.51, 1270, 417, 1414.71, 632.73, 64.91, 12607980],
+            ["300x300 (c)", 300, 300, 10.0, 15, 18, 94.0, 119.80, 20400, 6750, 13.1, 7.51, 1360, 450, 1464.75, 681.75, 76.50, 13706062],
+            ["300x300 (d)", 300, 305, 15.0, 15, 18, 106.0, 134.80, 21500, 7100, 12.6, 7.26, 1440, 466, 1555.50, 696.53, 87.20, 14416562],
+            ["300x300 (e)", 304, 301, 11.0, 17, 18, 106.0, 134.80, 23400, 7730, 13.2, 7.57, 1540, 514, 1718.61, 778.61, 114.77, 15908981],
+            ["350x175 (a)", 346, 174, 6.0, 9, 14, 41.4, 52.68, 11100, 792, 14.5, 3.88, 611, 91, 686.25, 139.52, 12.18, 2248327],
+            ["350x175 (b)", 350, 175, 7.0, 11, 14, 49.6, 63.14, 13600, 984, 14.7, 3.95, 775, 112, 873.71, 171.86, 21.60, 2829321],
+            ["350x175 (c)", 354, 176, 8.0, 13, 14, 57.8, 73.68, 16100, 1180, 14.8, 4.01, 909, 134, 1028.92, 205.81, 35.34, 3454360],
+            ["350x250 (a)", 336, 249, 8.0, 12, 20, 69.2, 88.15, 18500, 3090, 14.5, 5.92, 1100, 248, 1237.11, 378.18, 34.34, 8187550],
+            ["350x250 (b)", 340, 250, 9.0, 14, 20, 79.7, 101.50, 21700, 3650, 14.6, 6.00, 1280, 292, 1445.60, 445.05, 53.76, 9720225],
+            ["350x350 (a)", 338, 351, 13.0, 13, 20, 106.0, 135.30, 28200, 9380, 14.4, 8.33, 1670, 534, 1860.01, 811.85, 60.33, 24792570],
+            ["350x350 (b)", 344, 348, 10.0, 16, 20, 115.0, 146.00, 33300, 11200, 15.1, 8.78, 1940, 646, 2167.44, 981.14, 104.53, 30344000],
+            ["350x350 (c)", 344, 354, 16.0, 16, 20, 131.0, 166.60, 35300, 11800, 14.6, 8.43, 2050, 669, 2296.64, 1014.28, 111.45, 31807000],
+            ["350x350 (d)", 350, 350, 12.0, 19, 20, 137.0, 173.90, 40300, 13600, 15.2, 8.84, 2300, 776, 2588.60, 1181.75, 173.13, 37208440],
+            ["350x350 (e)", 350, 357, 19.0, 19, 20, 156.0, 198.40, 42800, 14400, 14.7, 8.53, 2450, 809, 2761.30, 1228.42, 186.22, 39400000],
+            ["400x200 (a)", 396, 199, 7.0, 11, 16, 56.6, 72.16, 20000, 1450, 16.7, 4.48, 1010, 145, 1135.58, 222.05, 20.91, 5372250],
+            ["400x200 (b)", 400, 200, 8.0, 13, 16, 66.0, 84.12, 23700, 1740, 16.8, 4.54, 1190, 174, 1342.11, 265.98, 35.65, 6514245],
+            ["400x200 (c)", 404, 201, 9.0, 15, 16, 76.5, 96.16, 27500, 2030, 16.9, 4.60, 1360, 202, 1541.25, 309.52, 53.79, 7665400],
+            ["400x300 (a)", 386, 299, 9.0, 14, 22, 94.3, 120.10, 33700, 6240, 16.7, 7.21, 1740, 418, 1957.56, 635.81, 63.88, 21637428],
+            ["400x300 (b)", 390, 300, 10.0, 16, 22, 107.0, 136.00, 38700, 7210, 16.9, 7.28, 1980, 481, 2235.00, 733.23, 92.54, 25320410],
+            ["400x400 (a)", 388, 402, 15.0, 15, 22, 140.0, 178.50, 49000, 16300, 16.6, 9.54, 2520, 809, 2818.61, 1231.02, 101.44, 56766225],
+            ["400x400 (b)", 394, 398, 11.0, 18, 22, 147.0, 186.80, 56100, 18900, 17.3, 10.10, 2850, 951, 3203.11, 1445.82, 156.41, 69219675],
+            ["400x400 (c)", 400, 400, 13.0, 21, 22, 172.0, 218.70, 66600, 22400, 17.5, 10.10, 3330, 1120, 3760.18, 1700.52, 228.31, 83865000],
+            ["400x400 (d)", 400, 408, 21.0, 21, 22, 197.0, 250.70, 70900, 23800, 16.8, 9.75, 3540, 1170, 3991.50, 1775.14, 233.11, 89102625],
+            ["400x400 (e)", 414, 405, 18.0, 28, 22, 232.0, 295.40, 92800, 31000, 17.7, 10.20, 4480, 1530, 5062.21, 2328.75, 451.21, 115847156],
+            ["450x200 (a)", 446, 199, 8.0, 12, 18, 66.2, 84.30, 28700, 1580, 18.5, 4.33, 1290, 159, 1455.12, 242.01, 30.22, 7433452],
+            ["450x200 (b)", 450, 200, 9.0, 14, 18, 76.0, 96.76, 33500, 1870, 18.6, 4.40, 1490, 187, 1686.25, 285.12, 48.45, 8885022],
+            ["450x200 (c)", 456, 201, 10.0, 17, 18, 88.9, 113.30, 40400, 2310, 18.9, 4.51, 1770, 230, 2008.44, 351.02, 84.21, 11402642],
+            ["450x300 (a)", 434, 299, 10.0, 15, 24, 106.0, 135.00, 46800, 6690, 18.6, 7.04, 2160, 448, 2445.61, 682.02, 76.45, 30064682],
+            ["450x300 (b)", 440, 300, 11.0, 18, 24, 124.0, 157.40, 56100, 8110, 18.9, 7.18, 2550, 541, 2895.84, 825.12, 122.34, 36634082],
+            ["450x300 (c)", 446, 302, 13.0, 21, 24, 145.0, 184.30, 66400, 9660, 19.0, 7.24, 2980, 639, 3404.12, 971.21, 188.54, 43595252],
+            ["500x200 (a)", 496, 199, 9.0, 14, 20, 79.5, 101.30, 41900, 1840, 20.3, 4.27, 1690, 185, 1918.61, 282.01, 50.12, 10724130],
+            ["500x200 (b)", 500, 200, 10.0, 16, 20, 89.6, 114.20, 47800, 2140, 20.5, 4.33, 1910, 214, 2172.54, 328.01, 74.52, 12652350],
+            ["500x200 (c)", 506, 201, 11.0, 19, 20, 103.0, 131.30, 56500, 2580, 20.7, 4.43, 2230, 257, 2545.12, 392.12, 121.21, 15352242],
+            ["500x300 (a)", 482, 300, 11.0, 15, 26, 114.0, 145.50, 60400, 6760, 20.4, 6.82, 2500, 451, 2831.11, 684.14, 85.33, 36926145],
+            ["500x300 (b)", 488, 300, 11.0, 18, 26, 128.0, 163.50, 71000, 8110, 20.8, 7.04, 2910, 541, 3314.71, 828.14, 132.55, 45640050],
+            ["500x300 (c)", 494, 302, 13.0, 21, 26, 150.0, 191.40, 83800, 9660, 20.9, 7.10, 3390, 640, 3878.61, 974.14, 212.11, 55616130],
+            ["600x200 (a)", 596, 199, 10.0, 15, 22, 94.6, 120.50, 68700, 1980, 23.9, 4.05, 2310, 199, 2595.84, 304.14, 74.41, 16688430],
+            ["600x200 (b)", 600, 200, 11.0, 17, 22, 106.0, 134.40, 77600, 2280, 24.0, 4.12, 2590, 228, 2863.18, 357.12, 106.41, 19374030],
+            ["600x200 (c)", 606, 201, 12.0, 20, 22, 120.0, 152.50, 90400, 2720, 24.3, 4.22, 2980, 271, 3314.21, 422.14, 162.33, 23383215],
+            ["600x200 (d)", 612, 202, 13.0, 23, 22, 134.0, 170.70, 103000, 3180, 24.6, 4.31, 3380, 314, 3788.61, 491.02, 234.41, 27801830],
+            ["600x300 (a)", 582, 300, 12.0, 17, 28, 137.0, 174.50, 103000, 7670, 24.3, 6.63, 3530, 511, 4004.21, 778.61, 118.52, 61200600],
+            ["600x300 (b)", 588, 300, 12.0, 20, 28, 151.0, 192.50, 118000, 9020, 24.8, 6.85, 4020, 601, 4581.12, 924.12, 184.21, 73465545],
+            ["600x300 (c)", 594, 302, 14.0, 23, 28, 175.0, 222.40, 137000, 10600, 24.9, 6.90, 4620, 701, 5288.60, 1074.12, 284.41, 87481245],
+            ["700x300 (a)", 692, 300, 13.0, 20, 28, 166.0, 211.50, 172000, 9020, 28.5, 6.53, 4980, 602, 5684.12, 914.02, 204.42, 101822775],
+            ["700x300 (b)", 700, 300, 13.0, 24, 28, 185.0, 235.50, 201000, 10800, 29.3, 6.78, 5760, 722, 6586.31, 1104.12, 312.44, 123594000],
+            ["800x300 (a)", 792, 300, 14.0, 22, 28, 191.0, 243.40, 254000, 9930, 32.3, 6.39, 6410, 662, 7328.61, 1018.61, 275.41, 147150600],
+            ["800x300 (b)", 800, 300, 14.0, 26, 28, 210.0, 267.40, 292000, 11700, 33.0, 6.62, 7290, 782, 8361.12, 1198.12, 414.41, 177654642],
+            ["900x300 (a)", 890, 299, 15.0, 23, 28, 213.0, 270.90, 345000, 10300, 35.7, 6.16, 7760, 688, 8871.25, 1061.02, 312.41, 195431682],
+            ["900x300 (b)", 900, 300, 16.0, 28, 28, 243.0, 309.80, 411000, 12600, 36.4, 6.39, 9140, 843, 10174.14, 1314.02, 534.42, 240016842],
+            ["900x300 (c)", 912, 302, 18.0, 34, 28, 286.0, 364.00, 498000, 15700, 37.0, 6.56, 10900, 1040, 12211.50, 1612.44, 864.21, 302400000]
+        ];
+
+        let currentSort = { column: -1, ascending: true };
+        let filteredData = [...data];
+
+        // Populate table
+        function renderTable(rows) {
+            const tbody = document.getElementById('tableBody');
+            const noResults = document.getElementById('noResults');
+            
+            if (rows.length === 0) {
+                tbody.innerHTML = '';
+                noResults.style.display = 'block';
+            } else {
+                noResults.style.display = 'none';
+                tbody.innerHTML = rows.map(row => `
+                    <tr>
+                        ${row.map((cell, i) => `<td>${formatNumber(cell)}</td>`).join('')}
+                    </tr>
+                `).join('');
+            }
+            
+            updateStats(rows.length);
+        }
+
+        function formatNumber(value) {
+            if (typeof value === 'number') {
+                return value.toLocaleString('en-US', { maximumFractionDigits: 2 });
+            }
+            return value;
+        }
+
+        function updateStats(visible) {
+            document.getElementById('visibleCount').textContent = visible;
+            document.getElementById('totalCount').textContent = data.length;
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                filteredData = [...data];
+            } else {
+                filteredData = data.filter(row => 
+                    row.some(cell => 
+                        cell.toString().toLowerCase().includes(searchTerm)
+                    )
+                );
+            }
+            
+            renderTable(filteredData);
+        });
+
+        // Sorting functionality
+        document.querySelectorAll('thead th').forEach((th, index) => {
+            th.addEventListener('click', () => {
+                const column = parseInt(th.dataset.column);
+                
+                if (currentSort.column === column) {
+                    currentSort.ascending = !currentSort.ascending;
+                } else {
+                    currentSort.column = column;
+                    currentSort.ascending = true;
+                }
+                
+                // Remove all sort classes
+                document.querySelectorAll('thead th').forEach(header => {
+                    header.classList.remove('sort-asc', 'sort-desc');
+                });
+                
+                // Add appropriate class
+                th.classList.add(currentSort.ascending ? 'sort-asc' : 'sort-desc');
+                
+                // Sort data
+                filteredData.sort((a, b) => {
+                    let aVal = a[column];
+                    let bVal = b[column];
+                    
+                    // Handle numeric comparison
+                    if (typeof aVal === 'number' && typeof bVal === 'number') {
+                        return currentSort.ascending ? aVal - bVal : bVal - aVal;
+                    }
+                    
+                    // Handle string comparison
+                    aVal = String(aVal).toLowerCase();
+                    bVal = String(bVal).toLowerCase();
+                    
+                    if (currentSort.ascending) {
+                        return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+                    } else {
+                        return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
+                    }
+                });
+                
+                renderTable(filteredData);
+            });
+        });
+
+        // Initial render
+        renderTable(data);
+    </script>
+</body>
+</html>
